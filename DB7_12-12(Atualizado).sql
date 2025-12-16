@@ -261,8 +261,182 @@ update produto set valorUnitario = valorUnitario *1.10 where codFornecedor = 5 a
 /*Questão 5*/
 delete from fornecedor where cidade LIKE 'A%' or nomeFornecedor LIKE 'B%'; 
 
+/*Questão 6*/
+
 select codCliente  as 'nome de clientes', email as 'email dos clientes' from cliente order by dataCadastro asc;
 
-select nomeCliente , dataCadastro from cliente where dataCadastro between '2024-01-01'and '2024-12-31';
+/*Questão 7*/
 
-select nomeProduto, valorUnitario from produto where not nomeProduto like 'Notebook 'and valorUnitario > 500.00;
+select nomeCliente , dataCadastro from cliente where dataCadastro between '2024-01-01'and '2024-12-31';
+/*Questão 8*/
+
+select nomeProduto, valorUnitario from produto where not nomeProduto like 'Notebook i5'and valorUnitario > 500.00;
+
+/*Questão 9*/
+select nomeFornecedor, cidade from fornecedor where cidade in ('São Paulo', 'Rio de Janeiro', 'Belo Horizonte');
+
+
+/*Questão 10*/
+select nomeTransportadora from transportadora where codTransportadora not in (1, 5, 10, 15);
+
+
+/*Questão 11*/
+SELECT nomeCliente, codPedido, valorTotal
+FROM cliente
+INNER JOIN pedido ON cliente.codCliente = pedido.codCliente
+WHERE valorTotal > 500.00;
+
+
+/*Questão 12*/
+SELECT nomeProduto, nomeFornecedor, cidade
+FROM produto
+INNER JOIN fornecedor ON produto.codFornecedor = fornecedor.codFornecedor
+ORDER BY nomeFornecedor DESC;
+
+
+
+
+/*Questão 13*/
+SELECT codPedido, nomeProduto, quantidade FROM pedido INNER JOIN item_pedido ON pedido.codPedido = item_pedido.codPedido INNER JOIN produto ON item_pedido.codProduto = produto.codProduto WHERE dataPedido > '2025-01-01' AND quantidade > 2;
+
+
+/*Questão 14*/
+SELECT c.nomeCliente,pr.nomeProduto,p.dataPedido FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+INNER JOIN item_pedido ip ON p.codPedido = ip.codPedido
+INNER JOIN produto pr ON ip.codProduto = pr.codProduto
+WHERE pr.codProduto = 15;
+
+
+
+/*Questão 15*/
+SELECT f.codFornecedor, COUNT(DISTINCT p.codProduto) AS ProdutosFornecidos
+FROM fornecedor f
+INNER JOIN produto p ON f.codFornecedor = p.codFornecedor
+GROUP BY f.codFornecedor;
+
+
+/*Questão 16*/
+SELECT f.cidade, MIN(p.valorUnitario) AS ProdutoMaisBarato
+FROM fornecedor f
+INNER JOIN produto p ON f.codFornecedor = p.codFornecedor
+GROUP BY f.cidade;
+
+
+/*Questão 17*/
+SELECT e.localizacao, MAX(e.quantidadeAtual) AS EstoqueMax
+FROM estoque e
+GROUP BY e.localizacao;
+
+
+/*Questão 18*/
+SELECT c.nomeCliente, t.nomeTransportadora
+FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+INNER JOIN entrega e ON p.codPedido = e.codPedido
+INNER JOIN transportadora t ON e.codTransportadora = t.codTransportadora
+WHERE e.statusEntrega <> 'Entregue'
+  AND t.codTransportadora <> 7;
+
+
+/*Questão 19*/
+SELECT t.nomeTransportadora,e.statusEntrega FROM entrega e
+INNER JOIN transportadora t ON e.codTransportadora = t.codTransportadora
+WHERE t.nomeTransportadora LIKE 'T%' AND e.codEntrega BETWEEN 100 AND 200;
+
+
+
+/*Questão 20*/
+SELECT c.nomeCliente, pr.nomeProduto, p.dataPedido, e.statusEntrega
+FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+INNER JOIN item_pedido ip ON p.codPedido = ip.codPedido
+INNER JOIN produto pr ON ip.codProduto = pr.codProduto
+INNER JOIN entrega e ON p.codPedido = e.codPedido
+WHERE pr.codProduto IN (2, 4, 6)
+ORDER BY e.dataEnvio DESC;
+
+
+
+
+/*Questão 21*/
+SELECT p.codPedido,
+       SUM(ip.precoVenda * ip.quantidade) AS FaturamentoBruto
+FROM pedido p
+INNER JOIN item_pedido ip ON p.codPedido = ip.codPedido
+GROUP BY p.codPedido;
+
+
+/*Questão 22*/
+SELECT codCliente, AVG(valorTotal) AS TicketMedio
+FROM pedido
+GROUP BY codCliente;
+
+
+/*Questão 23*/
+SELECT c.nomeCliente, p.dataPedido, e.statusEntrega
+FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+INNER JOIN entrega e ON p.codPedido = e.codPedido
+WHERE c.nomeCliente NOT LIKE '%Junior%'
+   OR e.statusEntrega <> 'Enviado';
+
+
+/*Questão 24*/
+SELECT pr.nomeProduto, f.nomeFornecedor, e.quantidadeAtual
+FROM produto pr
+INNER JOIN fornecedor f ON pr.codFornecedor = f.codFornecedor
+INNER JOIN estoque e ON pr.codProduto = e.codProduto
+ORDER BY f.nomeFornecedor ASC, e.quantidadeAtual DESC;
+
+
+/*Questão 25*/
+SELECT c.nomeCliente, pr.nomeProduto, ip.precoVenda
+FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+INNER JOIN item_pedido ip ON p.codPedido = ip.codPedido
+INNER JOIN produto pr ON ip.codProduto = pr.codProduto
+WHERE p.dataPedido BETWEEN '2025-03-01' AND '2025-05-31'
+  AND ip.precoVenda > 200.00;
+
+
+/*Questão 26*/
+SELECT MONTH(p.dataPedido) AS Mes,
+       COUNT(DISTINCT p.codCliente) AS TotalClientes
+FROM pedido p
+GROUP BY MONTH(p.dataPedido);
+
+
+/*Questão 27*/
+UPDATE estoque e
+INNER JOIN produto p ON e.codProduto = p.codProduto
+SET e.quantidadeAtual = 0
+WHERE p.codProduto IN (7, 8, 9, 11);
+
+
+/*Questão 28*/
+SELECT c.nomeCliente, p.dataPedido
+FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+WHERE c.email LIKE '%@gmail.com'
+  AND c.codCliente NOT IN (1, 2, 3);
+
+
+/*Questão 29*/
+SELECT pr.nomeProduto, MIN(ip.precoVenda) AS MenorPrecoHistorico
+FROM produto pr
+INNER JOIN item_pedido ip ON pr.codProduto = ip.codProduto
+GROUP BY pr.nomeProduto;
+
+
+/*Questão 30*/
+SELECT c.nomeCliente, pr.nomeProduto, t.nomeTransportadora, e.statusEntrega
+FROM cliente c
+INNER JOIN pedido p ON c.codCliente = p.codCliente
+INNER JOIN item_pedido ip ON p.codPedido = ip.codPedido
+INNER JOIN produto pr ON ip.codProduto = pr.codProduto
+INNER JOIN entrega e ON p.codPedido = e.codPedido
+INNER JOIN transportadora t ON e.codTransportadora = t.codTransportadora
+WHERE e.statusEntrega = 'Cancelado'
+   OR t.nomeTransportadora = 'Entrega Rápida';
+
